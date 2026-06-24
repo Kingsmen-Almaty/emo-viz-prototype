@@ -151,7 +151,7 @@ ai-trail-prototype/
 | Privacy | No visitor image is stored or uploaded by default. |
 | Model storage | Any local weights are outside the project folder under `local-models/`. |
 
-Backend implementation note: `pnpm backend` starts `backend/emotion_server.py` on `http://127.0.0.1:8787`. The browser sends a downscaled full-frame JPEG to `/detect` for fixed `Python YuNet multi-face` placement, and sends a local `192x192` JPEG face crop plus crop-relative landmarks to `/analyze` for `Python FER+ + YuNet assist` or `Python FER+ raw`. YuNet and FER+ ONNX models are stored in `/Users/ro/Desktop/KR+D/local-models/opencv/` or `KRD_LOCAL_MODELS_DIR`, not inside the repo.
+Backend implementation note: `pnpm backend` starts `backend/emotion_server.py` on `http://127.0.0.1:8787`. The browser sends a downscaled full-frame JPEG to `/detect` for fixed `Python YuNet multi-face` placement, and sends a local `192x192` JPEG face crop plus crop-relative landmarks to `/analyze` for `Python FER+ + YuNet assist` or `Python FER+ raw`. External apps can poll `GET /feature-placement` and `GET /emotion` for raw latest values without sending images; these GET routes return the most recent YuNet and FER+ payloads and do not run new inference or return visitor-facing sentiment copy. YuNet and FER+ ONNX models are stored in `/Users/ro/Desktop/KR+D/local-models/opencv/` or `KRD_LOCAL_MODELS_DIR`, not inside the repo.
 
 Firebase Hosting note: the static frontend is published at `https://ai-emotion-krd.web.app` under Firebase project ID `ai-emotion-krd` with display name `ai-emotion`. Firebase Hosting serves only the React app; a public backend requires deploying the Python service separately and rebuilding with `VITE_BACKEND_URL`.
 

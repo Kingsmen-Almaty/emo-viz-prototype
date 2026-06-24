@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import base64
+import copy
 import io
 import json
 import os
+import time
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from threading import Lock
+from urllib.parse import urlparse
 
 import cv2
 import numpy as np
@@ -21,6 +25,55 @@ YUNET_MODEL = MODEL_DIR / "opencv" / "face_detection_yunet_2023mar.onnx"
 FERPLUS_MODEL = MODEL_DIR / "opencv" / "emotion-ferplus-8.onnx"
 _yunet_detector = None
 _emotion_net = None
+_latest_lock = Lock()
+_latest_feature_result = None
+_latest_emotion_result = None
+
+
+def _now_ms():
+    return int(time.time() * 1000)
+
+
+def _set_latest(kind, payload):
+    global _latest_feature_result, _latest_emotion_result
+    cached = {
+        "ok": True,
+        "status": "ready",
+        "updatedAt": _now_ms(),
+        **payload,
+    }
+    with _latest_lock:
+        if kind == "feature":
+            _latest_feature_result = cached
+        if kind == "emotion":
+            _latest_emotion_result = cached
+    return cached
+
+
+def _get_latest(kind):
+    with _latest_lock:
+        cached = _latest_feature_result if kind == "feature" else _latest_emotion_result
+        if cached:
+            return copy.deepcopy(cached)
+
+    if kind == "feature":
+        return {
+            "ok": True,
+            "status": "empty",
+            "engine": "opencv-yunet",
+            "faces": [],
+            "frame": None,
+            "updatedAt": None,
+        }
+
+    return {
+        "ok": True,
+        "status": "empty",
+        "engine": "opencv-ferplus",
+        "expressions": {},
+        "metrics": None,
+        "updatedAt": None,
+    }
 
 
 def _normalise(scores):
@@ -249,6 +302,7 @@ class EmotionHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
 
@@ -256,7 +310,8 @@ class EmotionHandler(BaseHTTPRequestHandler):
         self._send_json(200, {"ok": True})
 
     def do_GET(self):
-        if self.path == "/health":
+        path = urlparse(self.path).path
+        if path == "/health":
             self._send_json(200, {
                 "ok": True,
                 "engine": "opencv-local-backend",
@@ -266,7 +321,23 @@ class EmotionHandler(BaseHTTPRequestHandler):
                 "modelReady": YUNET_MODEL.exists(),
                 "emotionModelPath": str(FERPLUS_MODEL),
                 "emotionModelReady": FERPLUS_MODEL.exists(),
+                "endpoints": {
+                    "featurePlacement": {
+                        "latest": "GET /feature-placement",
+                        "analyzeFrame": "POST /detect",
+                    },
+                    "emotion": {
+                        "latest": "GET /emotion",
+                        "analyzeCrop": "POST /analyze",
+                    },
+                },
             })
+            return
+        if path == "/feature-placement":
+            self._send_json(200, _get_latest("feature"))
+            return
+        if path == "/emotion":
+            self._send_json(200, _get_latest("emotion"))
             return
         self._send_json(404, {"error": "not found"})
 
@@ -277,7 +348,7 @@ class EmotionHandler(BaseHTTPRequestHandler):
                 payload = json.loads(self.rfile.read(length).decode("utf-8"))
                 image = _decode_data_url(payload["image"])
                 faces = detect_faces(image)
-                self._send_json(200, {
+                result = _set_latest("feature", {
                     "engine": "opencv-yunet",
                     "faces": faces,
                     "frame": {
@@ -285,6 +356,7 @@ class EmotionHandler(BaseHTTPRequestHandler):
                         "height": image.shape[0],
                     },
                 })
+                self._send_json(200, result)
             except Exception as exc:
                 self._send_json(500, {"error": str(exc)})
             return
@@ -298,11 +370,12 @@ class EmotionHandler(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(length).decode("utf-8"))
             image = _decode_data_url(payload["image"])
             expressions, metrics = analyse_expression(image, payload)
-            self._send_json(200, {
+            result = _set_latest("emotion", {
                 "engine": "opencv-ferplus-yunet-assist" if metrics.get("mode") == "ferplus-assisted" else "opencv-ferplus-raw",
                 "expressions": expressions,
                 "metrics": metrics,
             })
+            self._send_json(200, result)
         except Exception as exc:
             self._send_json(500, {"error": str(exc)})
 
@@ -313,6 +386,8 @@ class EmotionHandler(BaseHTTPRequestHandler):
 def main():
     server = ThreadingHTTPServer((HOST, PORT), EmotionHandler)
     print(f"Emotion backend listening on http://{HOST}:{PORT}")
+    print("GET /feature-placement returns the latest POST /detect result")
+    print("GET /emotion returns the latest POST /analyze result")
     print("POST /detect with JSON { image: fullFrameDataUrl, width, height }")
     print("POST /analyze with JSON { image: faceCropDataUrl, width, height }")
     server.serve_forever()
