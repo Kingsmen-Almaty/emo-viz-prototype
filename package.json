@@ -1,0 +1,26 @@
+{
+  "name": "ai-trail-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "backend": "python3 backend/emotion_server.py",
+    "build": "vite build",
+    "deploy:firebase": "pnpm build && node scripts/deploy-firebase-hosting.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "5.1.1",
+    "lucide-react": "0.561.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "vite": "8.0.16"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.57.0",
+    "pngjs": "7.0.0"
+  }
+}

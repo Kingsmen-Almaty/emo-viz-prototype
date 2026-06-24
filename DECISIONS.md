@@ -1,0 +1,37 @@
+# AI Trail Prototype Decisions
+
+## 2026-06-23 - Create Prototype Workspace Under CSMA Development
+
+**Decision:** Create `projects/CSMA/04-development/ai-trail-prototype/` as the live planning and prototype workspace for the AI Trail / AI Wall sentiment interaction.
+
+**Rationale:** The work is an active quick prototype, not a release or handover artefact, so it belongs in `04-development/` under CSMA folder semantics.
+
+## 2026-06-23 - Browser-First Prototype Before Hardware Integration
+
+**Decision:** Start with a browser-based camera prototype using React + Vite, canvas overlays, and a local or browser-capable face/emotion model before adding DMX / Art-Net LED control.
+
+**Rationale:** The proposal's key risk is the live visitor-facing read-and-response moment. A browser prototype can validate camera framing, overlay style, sentiment mapping, and visitor flow quickly before committing to hardware integration.
+
+## 2026-06-23 - Shared Model Store Required
+
+**Decision:** Any downloaded Hugging Face, Gemma, Transformers, or local model files must use `/Users/ro/Desktop/KR+D/local-models/` by default, with `KRD_LOCAL_MODELS_DIR` as the override.
+
+**Rationale:** KR+D's single folder principle keeps prototype folders small, prevents accidental Git commits of model binaries, and allows shared reuse across local AI experiments.
+
+## 2026-06-24 - Lock Feature Placement To Python YuNet
+
+**Decision:** Remove the browser feature-placement options from the live demo UI and lock facial feature placement to the local Python OpenCV YuNet multi-face backend.
+
+**Rationale:** Live testing showed browser-side feature placement was less reliable for far faces, angled faces, and side-to-side movement. YuNet gives the clearest current placement baseline and supports multiple detected faces, so simplifying the UI makes the prototype easier to test and explain.
+
+## 2026-06-24 - Keep Emotion Detection As Python FER+ Modes
+
+**Decision:** Remove the Human and Hugging Face browser emotion options from the UI. Retain two local Python emotion modes: `Python FER+ + YuNet assist` and `Python FER+ raw`.
+
+**Rationale:** Raw FER+ is useful as the model baseline, but it is strongly neutral-biased on some sad expressions. The assisted mode sends crop-relative YuNet landmarks with the face crop so the Python backend can boost sad-mouth geometry when FER+ underreads sadness.
+
+## 2026-06-24 - Publish Static Frontend To Firebase Hosting
+
+**Decision:** Publish the React frontend to Firebase Hosting under project ID `ai-emotion-krd`, display name `ai-emotion`, and Hosting URL `https://ai-emotion-krd.web.app`.
+
+**Rationale:** The requested project ID `ai-emotion` was already taken globally, so the deploy uses a KR+D-specific unique ID. Firebase Hosting serves the static frontend only; the Python YuNet/FER+ backend remains a separate local service until it is deployed to Cloud Run or another backend host and passed to the app via `VITE_BACKEND_URL`.

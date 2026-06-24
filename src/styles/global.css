@@ -1,0 +1,366 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #080908;
+  color: #f4f2eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 6px;
+  background: rgba(20, 22, 24, 0.72);
+  color: #f8f6ef;
+  cursor: pointer;
+}
+
+.appShell {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  background: #090b0c;
+}
+
+.experienceStage {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: #111;
+}
+
+.cameraVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  filter: contrast(1.05) saturate(0.82) sepia(0.1);
+}
+
+.sentimentCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.hiddenCanvas {
+  display: none;
+}
+
+.topPrompt {
+  position: absolute;
+  left: 32px;
+  top: 26px;
+  display: grid;
+  gap: 5px;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.75);
+}
+
+.topPrompt span,
+.sentimentResult span,
+.statusStrip,
+.diagnosticsPanel header span,
+.ledPanel header span {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.topPrompt strong {
+  max-width: 620px;
+  font-size: 25px;
+  line-height: 1.14;
+}
+
+.stageControls {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  display: flex;
+  gap: 8px;
+}
+
+.sentimentResult {
+  position: absolute;
+  left: 32px;
+  bottom: 28px;
+  width: min(620px, calc(100% - 64px));
+  display: grid;
+  gap: 7px;
+  padding: 16px 18px;
+  border-left: 2px solid rgba(255, 255, 255, 0.55);
+  background: linear-gradient(90deg, rgba(10, 12, 14, 0.72), rgba(10, 12, 14, 0.18));
+  backdrop-filter: blur(5px);
+}
+
+.sentimentResult strong {
+  font-size: 28px;
+  line-height: 1.08;
+}
+
+.sentimentResult small {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+.sidePanel {
+  min-width: 0;
+  padding: 18px;
+  display: grid;
+  grid-template-rows: auto auto auto auto auto minmax(200px, 1fr);
+  gap: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  background: #121619;
+}
+
+.statusStrip {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.statusStrip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.diagnosticsPanel,
+.ledPanel,
+.engineSelect,
+.samplePanel {
+  display: grid;
+  gap: 16px;
+}
+
+.engineSelect {
+  gap: 6px;
+  padding: 9px 10px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.engineSelect span,
+.engineSelect small {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.engineSelect > strong {
+  color: #f8f6ef;
+  font-size: 15px;
+}
+
+.engineSelect select {
+  width: 100%;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  padding: 0 34px 0 10px;
+  appearance: auto;
+  background: #1c2226;
+  color: #f8f6ef;
+  font: inherit;
+  font-size: 13px;
+}
+
+.samplePanel {
+  gap: 8px;
+  padding: 9px 10px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.samplePanel header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.samplePanel header span,
+.samplePanel header strong,
+.sampleMeta {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.samplePreview {
+  height: 84px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.samplePreview img {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  transform: scaleX(-1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.samplePlaceholder {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 12px;
+}
+
+.sampleMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.diagnosticsPanel header,
+.ledPanel header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.diagnosticsPanel header strong,
+.ledPanel header strong {
+  color: #fff;
+  font-size: 20px;
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 8px;
+  column-gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.metricGrid span,
+.barRow span {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 13px;
+}
+
+.metricGrid strong,
+.barRow strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bars {
+  display: grid;
+  gap: 10px;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 10px;
+}
+
+.barTrack {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.barFill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 220ms ease, background 220ms ease;
+}
+
+.ledPanel {
+  min-height: 0;
+}
+
+.ledGrid {
+  height: 100%;
+  min-height: 320px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 7px;
+}
+
+.ledGrid i {
+  display: block;
+  border-radius: 3px;
+  opacity: var(--level);
+  background: radial-gradient(circle, var(--led-accent), var(--led-colour) 46%, rgba(255, 255, 255, 0.04));
+  animation: ledPulse 2.8s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+.ledGrid--heavy-pulse i {
+  animation-duration: 1.8s;
+}
+
+.ledGrid--broken-fade i:nth-child(3n) {
+  opacity: 0.08;
+}
+
+.ledGrid--soft-shimmer i:nth-child(2n) {
+  animation-duration: 1.3s;
+}
+
+@keyframes ledPulse {
+  0%,
+  100% {
+    transform: scale(0.94);
+    filter: brightness(0.65);
+  }
+  50% {
+    transform: scale(1);
+    filter: brightness(1.25);
+  }
+}
+
+@media (max-width: 900px) {
+  .appShell {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) 280px;
+  }
+
+  .sidePanel {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    overflow: auto;
+  }
+
+  .statusStrip {
+    grid-column: 1 / -1;
+  }
+}
