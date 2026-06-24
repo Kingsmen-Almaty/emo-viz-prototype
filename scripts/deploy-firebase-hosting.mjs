@@ -51,7 +51,8 @@ async function main() {
   const files = walk(publicDir);
   console.log(`Deploying ${files.length} files to Firebase Hosting site ${site}`);
 
-  const version = await apiRequest(token, `${origin}/projects/-/sites/${site}/versions`, {
+  const siteName = `projects/${project}/sites/${site}`;
+  const version = await apiRequest(token, `${origin}/${siteName}/versions`, {
     method: 'POST',
     body: {
       status: 'CREATED',
@@ -95,7 +96,7 @@ async function main() {
   }
 
   const versionId = versionName.split('/').pop();
-  const finalized = await apiRequest(token, `${origin}/projects/-/sites/${site}/versions/${versionId}?updateMask=status,config`, {
+  const finalized = await apiRequest(token, `${origin}/${siteName}/versions/${versionId}?updateMask=status,config`, {
     method: 'PATCH',
     body: {
       status: 'FINALIZED',
@@ -105,7 +106,7 @@ async function main() {
     },
   });
 
-  const release = await apiRequest(token, `${origin}/projects/-/sites/${site}/channels/live/releases?versionName=${encodeURIComponent(versionName)}`, {
+  const release = await apiRequest(token, `${origin}/${siteName}/channels/live/releases?versionName=${encodeURIComponent(versionName)}`, {
     method: 'POST',
     body: { message: 'Deploy AI Trail emotion prototype' },
   });
