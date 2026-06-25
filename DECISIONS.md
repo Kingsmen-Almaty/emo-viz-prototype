@@ -32,13 +32,13 @@
 
 ## 2026-06-24 - Publish Static Frontend To Firebase Hosting
 
-**Decision:** Publish the React frontend to Firebase Hosting under project ID `ai-emotion-krd`, display name `ai-emotion`, and staging Hosting URL `https://ai-emotion-krd.web.app`.
+**Decision:** Publish the React frontend to Firebase Hosting under project ID `emo-viz`, display name `Emo Viz`, and staging Hosting URL `https://emo-viz.web.app`.
 
-**Rationale:** The requested project ID `ai-emotion` was already taken globally, so the deploy uses a KR+D-specific unique ID. Firebase Hosting serves the static frontend only; the Python YuNet/FER+ backend remains a separate local service until it is deployed to Cloud Run or another backend host and passed to the app via `VITE_BACKEND_URL`.
+**Rationale:** The requested prototype has been consolidated under the dedicated `emo-viz` project ID. Firebase Hosting serves the static frontend only; the Python YuNet/FER+ backend remains a separate local service until it is deployed to Cloud Run or another backend host and passed to the app via `VITE_BACKEND_URL`.
 
 ## 2026-06-24 - Host Public Backend On Cloud Run
 
-**Decision:** Deploy the Python YuNet/FER+ backend to Cloud Run service `emo-viz-backend` in Firebase/GCP project `ai-emotion-krd`, region `asia-southeast1`, and rebuild the Firebase frontend with `VITE_BACKEND_URL` pointing to staging API URL `https://emo-viz-backend-efq74kuc2a-as.a.run.app`.
+**Decision:** Deploy the Python YuNet/FER+ backend to Cloud Run service `emo-viz-backend` in Firebase/GCP project `emo-viz`, region `asia-southeast1`, and rebuild the Firebase frontend with `VITE_BACKEND_URL` pointing to staging API URL `https://emo-viz-backend-n2iej5lfpq-as.a.run.app`.
 
 **Rationale:** Firebase Hosting is static-only. A public web demo needs a reachable HTTPS backend so other users' browsers do not try to call their own `127.0.0.1:8787` loopback address.
 
@@ -47,3 +47,9 @@
 **Decision:** Add optional OSC-over-UDP output to the Python backend, disabled by default and enabled with `OSC_ENABLED=1`. Use normalized `0.0-1.0` feature coordinates and fixed face slots for TouchDesigner `OSC In CHOP` stability.
 
 **Rationale:** TouchDesigner works naturally with OSC/UDP on the local machine or exhibit LAN. Cloud Run cannot directly send UDP packets into an office or exhibit workstation behind NAT, so OSC is an install-side/local-backend integration path while Cloud Run remains the public web backend.
+
+## 2026-06-25 - Consolidate Cloud Resources Under Emo Viz
+
+**Decision:** Migrate Firebase Hosting and Cloud Run from the temporary `ai-emotion-krd` project into the dedicated GCP/Firebase project `emo-viz`, then decommission `ai-emotion-krd`.
+
+**Rationale:** The prototype, repository, service names, and public URLs should consistently use the Emo Viz name. Keeping the temporary project active would create stale URLs and unclear ownership during staging reviews.

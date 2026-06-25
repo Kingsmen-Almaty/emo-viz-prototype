@@ -29,7 +29,7 @@ Feature placement is fixed to `Python YuNet multi-face`. This should improve box
 
 Use `Emotion detection option` to compare `Python FER+ + YuNet assist` against `Python FER+ raw`. The side panel should show a `Backend sample` preview with a `192x192` JPEG crop and a backend status such as `18ms`.
 
-For public web testing from Firebase, use the hosted app at `https://ai-emotion-krd.web.app`. The production Firebase build should point to Cloud Run backend `https://emo-viz-backend-efq74kuc2a-as.a.run.app`, not local `127.0.0.1`.
+For public web testing from Firebase, use the hosted app at `https://emo-viz.web.app`. The production Firebase build should point to Cloud Run backend `https://emo-viz-backend-n2iej5lfpq-as.a.run.app`, not local `127.0.0.1`.
 
 For TouchDesigner testing on the same machine, run the backend with OSC enabled:
 
@@ -73,7 +73,7 @@ Then add an `OSC In CHOP` in TouchDesigner with Network Port `9000` and look for
 | Moving backwards loses the face | The detector now allows smaller faces and biases strongly toward the previously tracked visitor. If it still drops, keep the face inside the large scan frame and avoid strong backlight behind the head. |
 | Result flickers | Increase smoothing in `src/App.jsx` by raising `windowMs` or `minSamples`. |
 | Backend says `offline` | Start `pnpm backend` in a second terminal and confirm `http://127.0.0.1:8787/health` returns JSON. |
-| Firebase site says backend is offline on another laptop | Confirm the deployed frontend was built with `VITE_BACKEND_URL=https://emo-viz-backend-efq74kuc2a-as.a.run.app`; browsers on other machines cannot access your local `127.0.0.1`. |
+| Firebase site says backend is offline on another laptop | Confirm the deployed frontend was built with `VITE_BACKEND_URL=https://emo-viz-backend-n2iej5lfpq-as.a.run.app`; browsers on other machines cannot access your local `127.0.0.1`. |
 | TouchDesigner shows no OSC channels | Confirm backend was started with `OSC_ENABLED=1`, TouchDesigner `OSC In CHOP` is listening on the same `OSC_PORT`, and `OSC_HOST` points to the TouchDesigner machine's IP. |
 | Multiple people are in frame | `Python YuNet multi-face` detects multiple faces; the primary face drives the sentiment result while secondary faces are drawn as additional overlay boxes. |
 | Backend result still feels wrong | First verify feature boxes are aligned, then compare `Python FER+ + YuNet assist` with `Python FER+ raw`. Emotion accuracy depends on reliable face and landmark geometry. |

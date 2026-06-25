@@ -37,7 +37,7 @@ The prototype is split into a static React frontend and a local Python vision ba
 | Feature placement | Python OpenCV YuNet (`face_detection_yunet_2023mar.onnx`) | Fixed live path. Receives downscaled full-frame JPEGs at `/detect`, detects multiple faces, and returns face boxes plus eye, nose, mouth, and brow landmarks. |
 | Emotion analysis | Python OpenCV FER+ (`emotion-ferplus-8.onnx`) | Receives `192x192` face crops at `/analyze`. The default mode is `Python FER+ + YuNet assist`; `Python FER+ raw` remains available as the baseline. |
 | Sadness assist | YuNet landmark geometry | Uses crop-relative mouth/eye/nose landmarks to reduce FER+'s neutral bias on downturned-mouth sad expressions. |
-| Hosting | Firebase Hosting | Publishes the static frontend at `https://ai-emotion-krd.web.app`. |
+| Hosting | Firebase Hosting | Publishes the static frontend at `https://emo-viz.web.app`. |
 | Backend hosting | Cloud Run or local Python service | Public demos use the Cloud Run HTTPS backend. Local installs can run the same Python backend on the exhibit machine for TouchDesigner/OSC output. |
 | TouchDesigner output | OSC over UDP | Optional local output from the Python backend to TouchDesigner `OSC In CHOP`. Disabled by default and enabled with `OSC_ENABLED=1`. |
 
@@ -47,8 +47,9 @@ Keep local model weights in `/Users/ro/Desktop/KR+D/local-models/` or a `KRD_LOC
 
 | Environment | URL | Notes |
 |---|---|---|
-| Staging web app | `https://ai-emotion-krd.web.app` | Firebase Hosting site for the public Emo Viz prototype. |
-| Staging backend API | `https://emo-viz-backend-efq74kuc2a-as.a.run.app` | Cloud Run HTTPS backend used by the Firebase build. |
+| GCP/Firebase project | `emo-viz` | Sole active cloud project for the prototype; previous `ai-emotion-krd` project was decommissioned after migration. |
+| Staging web app | `https://emo-viz.web.app` | Firebase Hosting site for the public Emo Viz prototype. |
+| Staging backend API | `https://emo-viz-backend-n2iej5lfpq-as.a.run.app` | Cloud Run HTTPS backend used by the Firebase build. |
 | GitHub repository | `https://github.com/Kingsmen-Almaty/emo-viz-prototype` | Nested CSMA prototype repo. |
 | Local web app | `http://127.0.0.1:5178/` | MacBook camera testing via `pnpm dev --port 5178`. |
 | Local backend API | `http://127.0.0.1:8787/` | Python YuNet/FER+ service via `pnpm backend`. |
@@ -93,7 +94,7 @@ VITE_BACKEND_URL=https://your-backend.example.com pnpm build
 Current hosted backend:
 
 ```txt
-https://emo-viz-backend-efq74kuc2a-as.a.run.app
+https://emo-viz-backend-n2iej5lfpq-as.a.run.app
 ```
 
 ## Local JSON API
@@ -115,11 +116,11 @@ Fresh backend sessions return `status: "empty"` on the GET endpoints until the b
 Hosted Cloud Run API URLs:
 
 ```txt
-GET  https://emo-viz-backend-efq74kuc2a-as.a.run.app/health
-GET  https://emo-viz-backend-efq74kuc2a-as.a.run.app/feature-placement
-GET  https://emo-viz-backend-efq74kuc2a-as.a.run.app/emotion
-POST https://emo-viz-backend-efq74kuc2a-as.a.run.app/detect
-POST https://emo-viz-backend-efq74kuc2a-as.a.run.app/analyze
+GET  https://emo-viz-backend-n2iej5lfpq-as.a.run.app/health
+GET  https://emo-viz-backend-n2iej5lfpq-as.a.run.app/feature-placement
+GET  https://emo-viz-backend-n2iej5lfpq-as.a.run.app/emotion
+POST https://emo-viz-backend-n2iej5lfpq-as.a.run.app/detect
+POST https://emo-viz-backend-n2iej5lfpq-as.a.run.app/analyze
 ```
 
 Local API URLs:
@@ -201,7 +202,7 @@ Emotion GET shape:
 
 ## Firebase Hosting
 
-The Firebase Hosting target is configured for project ID `ai-emotion-krd`, with display name `ai-emotion`. The exact project ID `ai-emotion` was already taken globally.
+The Firebase Hosting target is configured for project ID `emo-viz`, site ID `emo-viz`, and display name `Emo Viz`.
 
 ```bash
 pnpm build
@@ -213,17 +214,17 @@ Firebase Hosting publishes the static React app from `dist/`. The Python YuNet/F
 For the current public web demo:
 
 ```bash
-VITE_BACKEND_URL=https://emo-viz-backend-efq74kuc2a-as.a.run.app pnpm run deploy:firebase
+VITE_BACKEND_URL=https://emo-viz-backend-n2iej5lfpq-as.a.run.app pnpm run deploy:firebase
 ```
 
 ## Cloud Run Backend
 
-The backend is deployed as a Cloud Run service in project `ai-emotion-krd`, region `asia-southeast1`.
+The backend is deployed as a Cloud Run service in project `emo-viz`, region `asia-southeast1`.
 
 ```bash
 gcloud run deploy emo-viz-backend \
   --source backend \
-  --project=ai-emotion-krd \
+  --project=emo-viz \
   --region=asia-southeast1 \
   --allow-unauthenticated \
   --memory=1Gi \

@@ -154,7 +154,7 @@ emo-viz-prototype/
 
 Backend implementation note: `pnpm backend` starts `backend/emotion_server.py` on `http://127.0.0.1:8787`. The browser sends a downscaled full-frame JPEG to `/detect` for fixed `Python YuNet multi-face` placement, and sends a local `192x192` JPEG face crop plus crop-relative landmarks to `/analyze` for `Python FER+ + YuNet assist` or `Python FER+ raw`. External apps can poll `GET /feature-placement` and `GET /emotion` for raw latest values without sending images; these GET routes return the most recent YuNet and FER+ payloads and do not run new inference or return visitor-facing sentiment copy. YuNet and FER+ ONNX models are stored in `/Users/ro/Desktop/KR+D/local-models/opencv/` or `KRD_LOCAL_MODELS_DIR`, not inside the repo. Cloud Run uses `/tmp/krd-local-models` at runtime.
 
-Firebase Hosting note: the static frontend is published at `https://ai-emotion-krd.web.app` under Firebase project ID `ai-emotion-krd` with display name `ai-emotion`. The public backend is Cloud Run service `emo-viz-backend` in `asia-southeast1` at `https://emo-viz-backend-efq74kuc2a-as.a.run.app`; deploy Firebase with `VITE_BACKEND_URL=https://emo-viz-backend-efq74kuc2a-as.a.run.app pnpm run deploy:firebase`.
+Firebase Hosting note: the static frontend is published at `https://emo-viz.web.app` under Firebase project ID `emo-viz` with display name `Emo Viz`. The public backend is Cloud Run service `emo-viz-backend` in `asia-southeast1` at `https://emo-viz-backend-n2iej5lfpq-as.a.run.app`; deploy Firebase with `VITE_BACKEND_URL=https://emo-viz-backend-n2iej5lfpq-as.a.run.app pnpm run deploy:firebase`.
 
 TouchDesigner note: enable local OSC with `OSC_ENABLED=1 OSC_HOST=127.0.0.1 OSC_PORT=9000 pnpm backend`, then use TouchDesigner `OSC In CHOP` on port `9000`. OSC uses prefix `/emoViz`, fixed face slots, normalized `0.0-1.0` coordinates, and emotion channels such as `/emoViz/face/0/emotion/happy`.
 
@@ -168,9 +168,9 @@ Ready for MacBook Pro user testing when:
 - Opening the real-camera URL shows `camera-live` after browser camera permission is granted.
 - Opening the real-camera URL shows `python-local`.
 
-Current evidence: build passes, Playwright passes in desktop/kiosk/test-feed modes, Playwright fake-camera mode confirms the app reaches `camera-live` and `python-local`, and Firebase Hosting returns HTTP 200 at `https://ai-emotion-krd.web.app`.
+Current evidence: build passes, Playwright passes in desktop/kiosk/test-feed modes, Playwright fake-camera mode confirms the app reaches `camera-live` and `python-local`, and Firebase Hosting returns HTTP 200 at `https://emo-viz.web.app`.
 
-Backend test evidence should include `pnpm backend`, `curl http://127.0.0.1:8787/health`, `curl https://emo-viz-backend-efq74kuc2a-as.a.run.app/health`, a live-browser check that `Python YuNet multi-face` updates the face count, and a live-browser check that the backend sample panel updates while comparing `Python FER+ + YuNet assist` with `Python FER+ raw`. TouchDesigner evidence should include `OSC_ENABLED=1 ... pnpm backend` and visible `/emoViz/...` channels in `OSC In CHOP`.
+Backend test evidence should include `pnpm backend`, `curl http://127.0.0.1:8787/health`, `curl https://emo-viz-backend-n2iej5lfpq-as.a.run.app/health`, a live-browser check that `Python YuNet multi-face` updates the face count, and a live-browser check that the backend sample panel updates while comparing `Python FER+ + YuNet assist` with `Python FER+ raw`. TouchDesigner evidence should include `OSC_ENABLED=1 ... pnpm backend` and visible `/emoViz/...` channels in `OSC In CHOP`.
 
 ## Open Questions
 

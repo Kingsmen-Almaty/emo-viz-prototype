@@ -4,8 +4,8 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { execFileSync } from 'node:child_process';
 
-const project = 'ai-emotion-krd';
-const site = 'ai-emotion-krd';
+const project = process.env.FIREBASE_PROJECT_ID || 'emo-viz';
+const site = process.env.FIREBASE_SITE_ID || 'emo-viz';
 const publicDir = path.resolve('dist');
 const origin = 'https://firebasehosting.googleapis.com/v1beta1';
 
