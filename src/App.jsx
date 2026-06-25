@@ -211,8 +211,8 @@ function App() {
   }, [detectFrame]);
 
   return (
-    <main className="appShell" data-testid="ai-trail-app">
-      <section className="experienceStage" aria-label="AI Trail live camera sentiment prototype">
+    <main className="appShell" data-testid="emo-viz-app">
+      <section className="experienceStage" aria-label="Emo Viz live camera sentiment prototype">
         <CameraFeed
           ref={videoRef}
           isTestMode={isTestMode}
@@ -227,7 +227,7 @@ function App() {
           isTestMode={isTestMode}
         />
         <div className="topPrompt">
-          <span>AI Trail</span>
+          <span>Emo Viz</span>
           <strong>How do you feel about the future of AI?</strong>
         </div>
         <SentimentResult tracking={tracking} sentiment={activeSentiment} />

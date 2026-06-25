@@ -20,12 +20,12 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium-desktop',
-      testMatch: /ai-trail\.spec\.js/,
+      testMatch: /emo-viz\.spec\.js/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     {
       name: 'chromium-kiosk',
-      testMatch: /ai-trail\.spec\.js/,
+      testMatch: /emo-viz\.spec\.js/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1920, height: 1080 } },
     },
     {

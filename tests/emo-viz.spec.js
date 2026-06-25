@@ -9,7 +9,7 @@ test('renders the test camera feed, sentiment overlay, diagnostics, and LED simu
 
   await page.goto('/?mode=test');
 
-  await expect(page.getByTestId('ai-trail-app')).toBeVisible();
+  await expect(page.getByTestId('emo-viz-app')).toBeVisible();
   await expect(page.getByTestId('camera-feed')).toBeVisible();
   await expect(page.getByTestId('sentiment-overlay')).toBeVisible();
   await expect(page.getByTestId('sentiment-result')).toContainText(/future of AI|You seem/);

@@ -1,8 +1,8 @@
-# AI Trail Prototype Decisions
+# Emo Viz Prototype Decisions
 
 ## 2026-06-23 - Create Prototype Workspace Under CSMA Development
 
-**Decision:** Create `projects/CSMA/04-development/ai-trail-prototype/` as the live planning and prototype workspace for the AI Trail / AI Wall sentiment interaction.
+**Decision:** Create `projects/CSMA/04-development/emo-viz-prototype/` as the live planning and prototype workspace for the Emo Viz / AI Wall sentiment interaction.
 
 **Rationale:** The work is an active quick prototype, not a release or handover artefact, so it belongs in `04-development/` under CSMA folder semantics.
 
@@ -32,6 +32,18 @@
 
 ## 2026-06-24 - Publish Static Frontend To Firebase Hosting
 
-**Decision:** Publish the React frontend to Firebase Hosting under project ID `ai-emotion-krd`, display name `ai-emotion`, and Hosting URL `https://ai-emotion-krd.web.app`.
+**Decision:** Publish the React frontend to Firebase Hosting under project ID `ai-emotion-krd`, display name `ai-emotion`, and staging Hosting URL `https://ai-emotion-krd.web.app`.
 
 **Rationale:** The requested project ID `ai-emotion` was already taken globally, so the deploy uses a KR+D-specific unique ID. Firebase Hosting serves the static frontend only; the Python YuNet/FER+ backend remains a separate local service until it is deployed to Cloud Run or another backend host and passed to the app via `VITE_BACKEND_URL`.
+
+## 2026-06-24 - Host Public Backend On Cloud Run
+
+**Decision:** Deploy the Python YuNet/FER+ backend to Cloud Run service `emo-viz-backend` in Firebase/GCP project `ai-emotion-krd`, region `asia-southeast1`, and rebuild the Firebase frontend with `VITE_BACKEND_URL` pointing to staging API URL `https://emo-viz-backend-efq74kuc2a-as.a.run.app`.
+
+**Rationale:** Firebase Hosting is static-only. A public web demo needs a reachable HTTPS backend so other users' browsers do not try to call their own `127.0.0.1:8787` loopback address.
+
+## 2026-06-24 - Use Local OSC Over UDP For TouchDesigner
+
+**Decision:** Add optional OSC-over-UDP output to the Python backend, disabled by default and enabled with `OSC_ENABLED=1`. Use normalized `0.0-1.0` feature coordinates and fixed face slots for TouchDesigner `OSC In CHOP` stability.
+
+**Rationale:** TouchDesigner works naturally with OSC/UDP on the local machine or exhibit LAN. Cloud Run cannot directly send UDP packets into an office or exhibit workstation behind NAT, so OSC is an install-side/local-backend integration path while Cloud Run remains the public web backend.

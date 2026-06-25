@@ -2,9 +2,9 @@
 
 Source: `/Users/ro/Downloads/ACSM_20260512_AI-Proposal.pdf`
 
-## AI Trail Entrance Direction
+## Emo Viz Entrance Direction
 
-The proposal positions the AI Trail as the start of enhanced AI learning in ACSM. The entrance should introduce the AI Trail with a panel and mascot, feel eye-catching and futuristic, and include a simple AI-based interaction that demonstrates a practical application of AI.
+The proposal positions the Emo Viz as the start of enhanced AI learning in ACSM. The entrance should introduce the Emo Viz with a panel and mascot, feel eye-catching and futuristic, and include a simple AI-based interaction that demonstrates a practical application of AI.
 
 The previous Prompt Lab placement at the entrance is deprioritised because of space and visitor-flow constraints, and because the robotic arm should remain the main lobby highlight.
 

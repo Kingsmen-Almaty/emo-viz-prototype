@@ -15,16 +15,37 @@ import cv2
 import numpy as np
 from PIL import Image
 
-HOST = "127.0.0.1"
-PORT = 8787
+try:
+    from pythonosc import udp_client
+except ImportError:
+    udp_client = None
+
+HOST = os.environ.get("HOST", "127.0.0.1")
+PORT = int(os.environ.get("PORT", "8787"))
 YUNET_URL = "https://huggingface.co/opencv/face_detection_yunet/resolve/main/face_detection_yunet_2023mar.onnx"
 FERPLUS_URL = "https://github.com/onnx/models/raw/main/validated/vision/body_analysis/emotion_ferplus/model/emotion-ferplus-8.onnx"
-DEFAULT_MODEL_DIR = Path("/Users/ro/Desktop/KR+D/local-models")
+DEFAULT_MODEL_DIR = Path("/tmp/krd-local-models" if os.environ.get("K_SERVICE") else "/Users/ro/Desktop/KR+D/local-models")
 MODEL_DIR = Path(os.environ.get("KRD_LOCAL_MODELS_DIR", DEFAULT_MODEL_DIR))
 YUNET_MODEL = MODEL_DIR / "opencv" / "face_detection_yunet_2023mar.onnx"
 FERPLUS_MODEL = MODEL_DIR / "opencv" / "emotion-ferplus-8.onnx"
+OSC_ENABLED = os.environ.get("OSC_ENABLED", "0").lower() in {"1", "true", "yes", "on"}
+OSC_HOST = os.environ.get("OSC_HOST", "127.0.0.1")
+OSC_PORT = int(os.environ.get("OSC_PORT", "9000"))
+OSC_PREFIX = "/" + os.environ.get("OSC_PREFIX", "emoViz").strip("/")
+OSC_MAX_FACES = int(os.environ.get("OSC_MAX_FACES", "6"))
+EMOTION_IDS = {
+    "neutral": 0,
+    "happy": 1,
+    "surprise": 2,
+    "sad": 3,
+    "fear": 4,
+    "angry": 5,
+    "disgust": 6,
+}
 _yunet_detector = None
 _emotion_net = None
+_osc_client = None
+_osc_warned = False
 _latest_lock = Lock()
 _latest_feature_result = None
 _latest_emotion_result = None
@@ -74,6 +95,100 @@ def _get_latest(kind):
         "metrics": None,
         "updatedAt": None,
     }
+
+
+def _get_osc_client():
+    global _osc_client, _osc_warned
+    if not OSC_ENABLED:
+        return None
+    if udp_client is None:
+        if not _osc_warned:
+            print("[emotion-backend] OSC disabled: python-osc is not installed")
+            _osc_warned = True
+        return None
+    if _osc_client is None:
+        _osc_client = udp_client.SimpleUDPClient(OSC_HOST, OSC_PORT)
+        print(f"[emotion-backend] OSC enabled: sending UDP to {OSC_HOST}:{OSC_PORT} with prefix {OSC_PREFIX}")
+    return _osc_client
+
+
+def _osc_address(*parts):
+    return "/".join([OSC_PREFIX.rstrip("/"), *[str(part).strip("/") for part in parts]])
+
+
+def _send_osc(path, value):
+    global _osc_warned
+    client = _get_osc_client()
+    if not client:
+        return
+    try:
+        client.send_message(path, float(value))
+    except Exception as exc:
+        if not _osc_warned:
+            print(f"[emotion-backend] OSC send failed: {exc}")
+            _osc_warned = True
+
+
+def _normalise_coordinate(value, size):
+    return max(0.0, min(1.0, float(value) / float(size or 1)))
+
+
+def _dominant_expression(expressions):
+    if not expressions:
+        return "neutral", 0.0
+    name, score = max(expressions.items(), key=lambda item: item[1])
+    return name, float(score)
+
+
+def _send_feature_osc(result):
+    frame = result.get("frame") or {}
+    frame_width = frame.get("width") or 1
+    frame_height = frame.get("height") or 1
+    faces = result.get("faces") or []
+    active_faces = min(len(faces), OSC_MAX_FACES)
+
+    _send_osc(_osc_address("status", "active"), 1 if active_faces else 0)
+    _send_osc(_osc_address("status", "faces"), active_faces)
+    _send_osc(_osc_address("status", "timestamp"), (result.get("updatedAt") or _now_ms()) / 1000)
+
+    for index in range(OSC_MAX_FACES):
+        face = faces[index] if index < len(faces) else None
+        base = ("face", index)
+        _send_osc(_osc_address(*base, "active"), 1 if face else 0)
+        if not face:
+            _send_osc(_osc_address(*base, "confidence"), 0)
+            for key in ("x", "y", "w", "h"):
+                _send_osc(_osc_address(*base, "box", key), 0)
+            for landmark in ("leftEye", "rightEye", "nose", "mouth", "brow", "leftMouth", "rightMouth"):
+                _send_osc(_osc_address(*base, "landmark", landmark, "x"), 0)
+                _send_osc(_osc_address(*base, "landmark", landmark, "y"), 0)
+            continue
+
+        _send_osc(_osc_address(*base, "confidence"), face.get("confidence", 0))
+        _send_osc(_osc_address(*base, "box", "x"), _normalise_coordinate(face.get("x", 0), frame_width))
+        _send_osc(_osc_address(*base, "box", "y"), _normalise_coordinate(face.get("y", 0), frame_height))
+        _send_osc(_osc_address(*base, "box", "w"), _normalise_coordinate(face.get("width", 0), frame_width))
+        _send_osc(_osc_address(*base, "box", "h"), _normalise_coordinate(face.get("height", 0), frame_height))
+
+        for name, point in (face.get("landmarks") or {}).items():
+            _send_osc(_osc_address(*base, "landmark", name, "x"), _normalise_coordinate(point.get("x", 0), frame_width))
+            _send_osc(_osc_address(*base, "landmark", name, "y"), _normalise_coordinate(point.get("y", 0), frame_height))
+
+
+def _send_emotion_osc(result):
+    expressions = result.get("expressions") or {}
+    dominant_name, dominant_score = _dominant_expression(expressions)
+    base = ("face", 0)
+
+    _send_osc(_osc_address("status", "timestamp"), (result.get("updatedAt") or _now_ms()) / 1000)
+    _send_osc(_osc_address(*base, "emotion", "dominantId"), EMOTION_IDS.get(dominant_name, 0))
+    _send_osc(_osc_address(*base, "emotion", "confidence"), dominant_score)
+    for name in EMOTION_IDS:
+        _send_osc(_osc_address(*base, "emotion", name), expressions.get(name, 0))
+
+    raw = ((result.get("metrics") or {}).get("raw") or {})
+    for name, value in raw.items():
+        _send_osc(_osc_address(*base, "emotion", "raw", name), value)
 
 
 def _normalise(scores):
@@ -317,10 +432,19 @@ class EmotionHandler(BaseHTTPRequestHandler):
                 "engine": "opencv-local-backend",
                 "featureDetector": "opencv-yunet",
                 "emotionDetector": "opencv-ferplus",
+                "cloudRun": bool(os.environ.get("K_SERVICE")),
                 "modelPath": str(YUNET_MODEL),
                 "modelReady": YUNET_MODEL.exists(),
                 "emotionModelPath": str(FERPLUS_MODEL),
                 "emotionModelReady": FERPLUS_MODEL.exists(),
+                "osc": {
+                    "enabled": OSC_ENABLED,
+                    "host": OSC_HOST,
+                    "port": OSC_PORT,
+                    "prefix": OSC_PREFIX,
+                    "maxFaces": OSC_MAX_FACES,
+                    "available": udp_client is not None,
+                },
                 "endpoints": {
                     "featurePlacement": {
                         "latest": "GET /feature-placement",
@@ -356,6 +480,7 @@ class EmotionHandler(BaseHTTPRequestHandler):
                         "height": image.shape[0],
                     },
                 })
+                _send_feature_osc(result)
                 self._send_json(200, result)
             except Exception as exc:
                 self._send_json(500, {"error": str(exc)})
@@ -375,6 +500,7 @@ class EmotionHandler(BaseHTTPRequestHandler):
                 "expressions": expressions,
                 "metrics": metrics,
             })
+            _send_emotion_osc(result)
             self._send_json(200, result)
         except Exception as exc:
             self._send_json(500, {"error": str(exc)})
@@ -386,6 +512,7 @@ class EmotionHandler(BaseHTTPRequestHandler):
 def main():
     server = ThreadingHTTPServer((HOST, PORT), EmotionHandler)
     print(f"Emotion backend listening on http://{HOST}:{PORT}")
+    print(f"OSC over UDP {'enabled' if OSC_ENABLED else 'disabled'} ({OSC_HOST}:{OSC_PORT}, prefix {OSC_PREFIX})")
     print("GET /feature-placement returns the latest POST /detect result")
     print("GET /emotion returns the latest POST /analyze result")
     print("POST /detect with JSON { image: fullFrameDataUrl, width, height }")

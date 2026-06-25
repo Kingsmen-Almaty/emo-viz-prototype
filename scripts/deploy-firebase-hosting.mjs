@@ -108,7 +108,7 @@ async function main() {
 
   const release = await apiRequest(token, `${origin}/${siteName}/channels/live/releases?versionName=${encodeURIComponent(versionName)}`, {
     method: 'POST',
-    body: { message: 'Deploy AI Trail emotion prototype' },
+    body: { message: 'Deploy Emo Viz emotion prototype' },
   });
 
   console.log(JSON.stringify({

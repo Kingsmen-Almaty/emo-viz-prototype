@@ -1,4 +1,4 @@
-# AI Trail Facial Sentiment Overlay Prototype Plan
+# Emo Viz Facial Sentiment Overlay Prototype Plan
 
 ## Prototype Outcome
 
@@ -13,7 +13,7 @@ flowchart LR
   Camera["Webcam getUserMedia"] --> Video["Live video element"]
   Video --> Placement["Python YuNet multi-face placement"]
   Placement --> Smoothing["Confidence smoothing 2-3s"]
-  Smoothing --> Mapping["Emotion to AI Trail sentiment"]
+  Smoothing --> Mapping["Emotion to Emo Viz sentiment"]
   Video --> Canvas["Overlay canvas"]
   Mapping --> Canvas
   Mapping --> LEDSim["LED mesh simulation"]
@@ -87,7 +87,7 @@ export const sentimentMap = {
 When ready to build the app, scaffold:
 
 ```text
-ai-trail-prototype/
+emo-viz-prototype/
   package.json
   index.html
   src/
@@ -136,7 +136,8 @@ ai-trail-prototype/
 13. [x] Add Python FER+ emotion backend modes for raw and YuNet-assisted analysis.
 14. [x] Add backend YuNet multi-face placement from downscaled full-frame camera samples.
 15. [x] Publish the static React frontend to Firebase Hosting.
-16. [ ] Deploy the Python YuNet/FER+ backend to Cloud Run or another public backend host if a fully remote demo is required.
+16. [x] Deploy the Python YuNet/FER+ backend to Cloud Run for public web access.
+17. [x] Add optional OSC-over-UDP output for TouchDesigner local integration.
 
 ## Acceptance Criteria
 
@@ -151,9 +152,11 @@ ai-trail-prototype/
 | Privacy | No visitor image is stored or uploaded by default. |
 | Model storage | Any local weights are outside the project folder under `local-models/`. |
 
-Backend implementation note: `pnpm backend` starts `backend/emotion_server.py` on `http://127.0.0.1:8787`. The browser sends a downscaled full-frame JPEG to `/detect` for fixed `Python YuNet multi-face` placement, and sends a local `192x192` JPEG face crop plus crop-relative landmarks to `/analyze` for `Python FER+ + YuNet assist` or `Python FER+ raw`. External apps can poll `GET /feature-placement` and `GET /emotion` for raw latest values without sending images; these GET routes return the most recent YuNet and FER+ payloads and do not run new inference or return visitor-facing sentiment copy. YuNet and FER+ ONNX models are stored in `/Users/ro/Desktop/KR+D/local-models/opencv/` or `KRD_LOCAL_MODELS_DIR`, not inside the repo.
+Backend implementation note: `pnpm backend` starts `backend/emotion_server.py` on `http://127.0.0.1:8787`. The browser sends a downscaled full-frame JPEG to `/detect` for fixed `Python YuNet multi-face` placement, and sends a local `192x192` JPEG face crop plus crop-relative landmarks to `/analyze` for `Python FER+ + YuNet assist` or `Python FER+ raw`. External apps can poll `GET /feature-placement` and `GET /emotion` for raw latest values without sending images; these GET routes return the most recent YuNet and FER+ payloads and do not run new inference or return visitor-facing sentiment copy. YuNet and FER+ ONNX models are stored in `/Users/ro/Desktop/KR+D/local-models/opencv/` or `KRD_LOCAL_MODELS_DIR`, not inside the repo. Cloud Run uses `/tmp/krd-local-models` at runtime.
 
-Firebase Hosting note: the static frontend is published at `https://ai-emotion-krd.web.app` under Firebase project ID `ai-emotion-krd` with display name `ai-emotion`. Firebase Hosting serves only the React app; a public backend requires deploying the Python service separately and rebuilding with `VITE_BACKEND_URL`.
+Firebase Hosting note: the static frontend is published at `https://ai-emotion-krd.web.app` under Firebase project ID `ai-emotion-krd` with display name `ai-emotion`. The public backend is Cloud Run service `emo-viz-backend` in `asia-southeast1` at `https://emo-viz-backend-efq74kuc2a-as.a.run.app`; deploy Firebase with `VITE_BACKEND_URL=https://emo-viz-backend-efq74kuc2a-as.a.run.app pnpm run deploy:firebase`.
+
+TouchDesigner note: enable local OSC with `OSC_ENABLED=1 OSC_HOST=127.0.0.1 OSC_PORT=9000 pnpm backend`, then use TouchDesigner `OSC In CHOP` on port `9000`. OSC uses prefix `/emoViz`, fixed face slots, normalized `0.0-1.0` coordinates, and emotion channels such as `/emoViz/face/0/emotion/happy`.
 
 ## User Testing Readiness Gate
 
@@ -167,7 +170,7 @@ Ready for MacBook Pro user testing when:
 
 Current evidence: build passes, Playwright passes in desktop/kiosk/test-feed modes, Playwright fake-camera mode confirms the app reaches `camera-live` and `python-local`, and Firebase Hosting returns HTTP 200 at `https://ai-emotion-krd.web.app`.
 
-Backend test evidence should include `pnpm backend`, `curl http://127.0.0.1:8787/health`, a live-browser check that `Python YuNet multi-face` updates the face count, and a live-browser check that the backend sample panel updates while comparing `Python FER+ + YuNet assist` with `Python FER+ raw`.
+Backend test evidence should include `pnpm backend`, `curl http://127.0.0.1:8787/health`, `curl https://emo-viz-backend-efq74kuc2a-as.a.run.app/health`, a live-browser check that `Python YuNet multi-face` updates the face count, and a live-browser check that the backend sample panel updates while comparing `Python FER+ + YuNet assist` with `Python FER+ raw`. TouchDesigner evidence should include `OSC_ENABLED=1 ... pnpm backend` and visible `/emoViz/...` channels in `OSC In CHOP`.
 
 ## Open Questions
 

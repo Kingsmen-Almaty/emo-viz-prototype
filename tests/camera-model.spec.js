@@ -7,7 +7,7 @@ test('boots the real camera permission path and default Python model path', asyn
   });
 
   await page.goto('/');
-  await expect(page.getByTestId('ai-trail-app')).toBeVisible();
+  await expect(page.getByTestId('emo-viz-app')).toBeVisible();
   await expect(page.getByTestId('camera-feed')).toBeVisible();
   await expect(page.getByText(/camera-live|requesting-camera/)).toBeVisible();
   await expect(page.getByText(/python-local|test-detector/)).toBeVisible({ timeout: 15000 });
