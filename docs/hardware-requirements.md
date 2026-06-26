@@ -1,18 +1,18 @@
-# Emo Viz Production Hardware Requirements
+# Emo Viz Hardware Requirements
 
-This document defines production-ready hardware for running the Emo Viz local stack on one PC:
+This document defines installation-ready hardware for running the Emo Viz local stack on one PC:
 
 - Browser frontend with live camera feed.
 - Python OpenCV YuNet/FER+ backend on `127.0.0.1:8787`.
-- TouchDesigner on the same PC receiving OSC over UDP, usually `127.0.0.1:9000`, and rendering the production emotion grid / lighting visual.
+- TouchDesigner on the same PC receiving OSC over UDP, usually `127.0.0.1:9000`, and rendering the TouchDesigner emotion grid / lighting visual.
 - 55-inch 4K installation display as shown in the AI Wall setup option.
 - Up to 4 detected visitor faces in the camera view, including mixed adult and child heights.
 
-The Python backend is lightweight compared with TouchDesigner. For production, size the PC around TouchDesigner GPU load, camera reliability, 55-inch display output, cooling, and all-day stability. The browser app is not assumed to be the final public emotion-grid renderer; TouchDesigner is the definite production visual layer.
+The Python backend is lightweight compared with TouchDesigner. For the install, size the PC around TouchDesigner GPU load, camera reliability, 55-inch display output, cooling, and all-day stability. The browser app is not assumed to be the final public emotion-grid renderer; TouchDesigner is the definite final visual layer.
 
 ## Camera Recommendation
 
-Use one production camera for the first install unless the physical space cannot be covered cleanly from a single viewpoint.
+Use one installation camera for the first install unless the physical space cannot be covered cleanly from a single viewpoint.
 
 One camera is recommended because the current web and backend pipeline expects one live camera stream. A single well-mounted wide-FOV camera avoids duplicate detections, mismatched timestamps, identity confusion, and extra calibration work between two views. YuNet can detect multiple faces from one frame, so the four-person requirement is mainly a camera coverage and image-quality problem, not a camera-count problem.
 
@@ -43,9 +43,9 @@ Recommended starting setup:
 
 If procurement cannot source the CAM130, use the same selection criteria rather than buying the cheapest 4K webcam: 4K sensor, 90 to 120-degree usable FOV, reliable USB 3 connection, lockable image settings, tripod/wall mounting, and good indoor-light performance.
 
-## Production Camera Spec
+## Camera Spec
 
-| Requirement | Production Baseline |
+| Requirement | Installation Baseline |
 |---|---|
 | Camera count | 1 primary camera, recommended AVer CAM130 |
 | Resolution | 4K sensor preferred; 1080p usable only if the interaction zone is close and well lit |
@@ -65,7 +65,7 @@ Target the interaction zone directly in front of the 55-inch display, not the fu
 
 #### 1-Camera Setup Placement
 
-For the current production baseline, install one active camera in the side camera bay beside the 55-inch display.
+For the current installation baseline, install one active camera in the side camera bay beside the 55-inch display.
 
 Preferred placement:
 
@@ -96,17 +96,17 @@ For mixed adult/child detection, the active camera should be tested with a child
 
 | Option | Recommendation | Use When | Avoid When |
 |---|---|---|---|
-| One wide-FOV camera | Default production path | One defined interaction zone in front of the 55-inch display; up to 4 visitors can stand within the guided area; camera can be mounted in the side camera bay | The side camera angle cannot see both adult and child faces clearly, or faces become too small |
+| One wide-FOV camera | Default installation path | One defined interaction zone in front of the 55-inch display; up to 4 visitors can stand within the guided area; camera can be mounted in the side camera bay | The side camera angle cannot see both adult and child faces clearly, or faces become too small |
 | Two physical camera positions | Reserve / fallback path | The wall fabrication follows the drawing and can reserve two camera apertures for redundancy, future expansion, or alternate lens height | Both cameras are expected to be active without added software support |
-| Two active camera feeds | Future integration scope | Site testing proves one camera cannot cover the visitor zone due to occlusion, sharp angle, or height differences | You need a simple first production deployment with one clean set of face slots |
+| Two active camera feeds | Future integration scope | Site testing proves one camera cannot cover the visitor zone due to occlusion, sharp angle, or height differences | You need a simple first install with one clean set of face slots |
 
 For two cameras, do not simply run two feeds into TouchDesigner without a plan. The system must decide whether to select one active camera, merge detections, or assign separate face-slot ranges per camera. That is additional software and QA scope.
 
-## Production Display Spec
+## Display Spec
 
-The AI Wall setup option calls for a 55-inch 4K display. Treat this as a production display requirement, not a consumer-TV placeholder.
+The AI Wall setup option calls for a 55-inch 4K display. Treat this as an installation display requirement, not a consumer-TV placeholder.
 
-| Requirement | Production Baseline |
+| Requirement | Installation Baseline |
 |---|---|
 | Screen size | 55-inch class |
 | Resolution | Native 3840 x 2160 4K UHD |
@@ -129,11 +129,11 @@ Display placement notes:
 - Use native 4K output from the PC where possible, then let TouchDesigner scale/render the final visual intentionally rather than relying on display-side scaling.
 - Disable consumer display features such as motion smoothing, auto-dimming, eco mode, overscan, and sleep timers.
 
-## Production PC Spec
+## PC Spec
 
-This is the recommended production baseline for one PC running the camera/browser control surface, Python backend, and TouchDesigner production visual together.
+This is the recommended installation baseline for one PC running the camera/browser control surface, Python backend, and TouchDesigner visual layer together.
 
-| Component | Production Baseline |
+| Component | Installation Baseline |
 |---|---|
 | OS | Windows 11 Pro, 64-bit, clean install |
 | CPU | Modern 8-core high-clock desktop CPU, such as Intel Core i7/i9 or AMD Ryzen 7/9 |
@@ -147,7 +147,7 @@ This is the recommended production baseline for one PC running the camera/browse
 | Power | UPS-backed power, no battery-only laptop operation |
 | Cooling | Desktop/workstation chassis with sustained airflow |
 
-Expected production behaviour:
+Expected install behaviour:
 
 - Four faces can be detected when they are visible, sufficiently lit, and large enough in frame.
 - Browser/control surface, Python backend, and TouchDesigner run together without visible contention.
@@ -156,7 +156,7 @@ Expected production behaviour:
 
 ## Ideal / Headroom Spec
 
-TouchDesigner is required for the production emotion grid and lighting visual. Use this headroom spec when the required TouchDesigner scene becomes richer, drives higher-resolution outputs, connects to LED processors or projection, uses multiple outputs, or must run for long public operation with extra performance margin.
+TouchDesigner is required for the emotion grid and lighting visual. Use this headroom spec when the required TouchDesigner scene becomes richer, drives higher-resolution outputs, connects to LED processors or projection, uses multiple outputs, or must run for long public operation with extra performance margin.
 
 | Component | Ideal |
 |---|---|
@@ -179,16 +179,16 @@ TouchDesigner is required for the production emotion grid and lighting visual. U
 | Browser | Current Chrome or Edge |
 | Node | Project-managed Node environment with `pnpm` |
 | Python | Python 3.11+ recommended with `backend/requirements.txt` installed |
-| TouchDesigner | Current production build tested against the selected GPU driver |
+| TouchDesigner | Current stable build tested against the selected GPU driver |
 | GPU driver | Current NVIDIA Studio driver preferred for NVIDIA systems |
 | Firewall | Allow local HTTP on `127.0.0.1:8787`; allow UDP OSC on the selected port if TouchDesigner is on another machine |
 | Power settings | High performance mode; sleep, display sleep, USB selective suspend, and automatic restarts disabled during show hours |
 
 ## TouchDesigner Notes
 
-Derivative's current requirements list Windows 10/11, Vulkan 1.1-capable GPU support, 4 GB VRAM minimum, and 8 GB+ VRAM recommended. For production Emo Viz, treat 8 GB VRAM as the floor and 12 GB+ as preferred headroom.
+Derivative's current requirements list Windows 10/11, Vulkan 1.1-capable GPU support, 4 GB VRAM minimum, and 8 GB+ VRAM recommended. For Emo Viz, treat 8 GB VRAM as the floor and 12 GB+ as preferred headroom.
 
-NVIDIA GPUs are the safest show-machine choice because TouchDesigner workflows, driver tooling, and pro display features are usually strongest there. Integrated graphics are not recommended for production.
+NVIDIA GPUs are the safest show-machine choice because TouchDesigner workflows, driver tooling, and pro display features are usually strongest there. Integrated graphics are not recommended for the install.
 
 For laptop builds, force TouchDesigner to use the discrete GPU in Windows Graphics settings and the NVIDIA Control Panel. However, a desktop or workstation chassis is preferred for thermal stability.
 
@@ -206,10 +206,10 @@ Python backend
 
 TouchDesigner
   -> OSC In CHOP, port 9000
-  -> Production emotion grid / lighting visual on 55-inch display
+  -> TouchDesigner emotion grid / lighting visual on 55-inch display
 ```
 
-## Production Acceptance Test
+## Acceptance Test
 
 Run this checklist on the target PC and camera mount before calling the system hardware-ready:
 
@@ -220,13 +220,13 @@ Run this checklist on the target PC and camera mount before calling the system h
 5. Test includes at least one adult, one child-height subject, and mixed heights standing together.
 6. Face boxes remain stable at the intended visitor distance and do not jump to background faces or posters.
 7. TouchDesigner receives `/emoViz/...` channels through `OSC In CHOP`.
-8. The 55-inch display runs at native 3840 x 2160 and 60 Hz from the production GPU output.
-9. TouchDesigner holds target FPS with the final production emotion-grid / lighting network loaded on the 55-inch display.
+8. The 55-inch display runs at native 3840 x 2160 and 60 Hz from the installation GPU output.
+9. TouchDesigner holds target FPS with the final TouchDesigner emotion-grid / lighting network loaded on the 55-inch display.
 10. CPU, GPU, VRAM, RAM, and disk activity remain within safe sustained ranges during a 2-hour soak test.
 11. Windows power mode is set to performance, sleep is disabled, USB selective suspend is disabled, and automatic updates are paused for the show window.
 12. Reboot recovery is tested: PC restarts, backend launches, browser launches, TouchDesigner opens, display output returns at the correct resolution, and OSC channels return.
 
-## Not Recommended For Production
+## Not Recommended For The Install
 
 - Integrated graphics.
 - Battery-powered laptop operation.
@@ -236,7 +236,7 @@ Run this checklist on the target PC and camera mount before calling the system h
 - Shared weak USB hub for camera and other high-bandwidth devices.
 - Wi-Fi for show-critical control paths.
 - Two-camera deployment without explicit software support for camera selection, face-slot assignment, or detection fusion.
-- Treating Cloud Run OSC as a production path. OSC over UDP should stay local or LAN-based.
+- Treating Cloud Run OSC as an installation path. OSC over UDP should stay local or LAN-based.
 
 ## Procurement Summary
 
