@@ -59,3 +59,9 @@
 **Decision:** For the production hardware recommendation, use one high-quality wide-FOV 4K camera as the default path for detecting up to four adult/child faces, paired with a Windows 11 Pro desktop/workstation, NVIDIA RTX GPU, 32 GB RAM minimum, direct USB 3 camera input, wired Ethernet, and UPS-backed power. Reserve a second camera only as a site-specific fallback if testing proves one camera cannot cover the interaction zone.
 
 **Rationale:** The current browser/backend pipeline expects one live camera stream, and YuNet can detect multiple faces in one frame. A second camera would add integration scope for camera selection, duplicate detection handling, or detection fusion, so it should not be part of the baseline unless the physical install demands it.
+
+## 2026-06-26 - Camera Data Namespace For TouchDesigner
+
+**Decision:** Treat the current production baseline as one active camera feed from camera `0`, even if the wall fabrication reserves two physical camera positions. If two active camera feeds are added later, expose `cameraId` and camera-local `faceIndex` in JSON and use an OSC namespace such as `/emoViz/camera/0/face/0/...`.
+
+**Rationale:** TouchDesigner needs stable, unambiguous channels. Keeping the current one-camera output simple avoids duplicate detections, while reserving a clear future namespace prevents ambiguity if the second camera position becomes active.

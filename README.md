@@ -86,6 +86,8 @@ Feature placement is fixed to `Python YuNet multi-face`. The frontend sends a do
 
 For emotion analysis, use the side panel to switch between `Python FER+ + YuNet assist` and `Python FER+ raw`. The frontend sends a small `192x192` JPEG face crop to `http://127.0.0.1:8787/analyze` roughly once every 700ms, and the backend runs the FER+ ONNX model locally through OpenCV DNN.
 
+Production note: the AI Wall drawing reserves two physical camera positions beside the 55-inch display. The current software baseline uses one active camera feed first. If two cameras are installed physically, keep the second as a reserved/spare/alternate-angle position until the backend and TouchDesigner network are explicitly extended for two active feeds.
+
 Set `VITE_BACKEND_URL` when the Python backend is hosted somewhere other than the local workstation:
 
 ```bash
@@ -113,6 +115,78 @@ The GET endpoints do not run new inference and do not return the Emo Viz sentime
 | `GET` | `/emotion` | Returns the latest raw FER+ emotion result, including normalized expressions, raw FER+ metrics, assist metrics, and `updatedAt`. |
 
 Fresh backend sessions return `status: "empty"` on the GET endpoints until the browser or another client has posted at least one frame/crop.
+
+## Camera Data Points
+
+For the current one-active-camera setup, all `/detect`, `/feature-placement`, `/analyze`, `/emotion`, and OSC data should be treated as coming from camera `0`.
+
+If the wall later uses two active camera feeds, keep the data shape explicit so TouchDesigner can route channels cleanly:
+
+- `cameraId: 0` should represent the primary active camera in the side camera bay beside the 55-inch display.
+- `cameraId: 1` should represent the secondary reserved camera position, only when multi-camera software support is added.
+- `faceIndex` should remain local to each camera unless a future fusion layer assigns a global visitor ID.
+- A two-camera payload should expose both `cameraId` and `faceIndex`, for example `cameraId: 1, faceIndex: 2`.
+- TouchDesigner should not assume that `/face/0` from camera `0` and `/face/0` from camera `1` are the same person.
+
+Recommended future JSON shape for two-camera feature placement:
+
+```json
+{
+  "ok": true,
+  "status": "ready",
+  "updatedAt": 1719200000000,
+  "engine": "opencv-yunet",
+  "cameras": [
+    {
+      "cameraId": 0,
+      "sourceId": "primary-side-bay",
+      "frame": { "width": 640, "height": 360 },
+      "faces": [
+        {
+          "cameraId": 0,
+          "faceIndex": 0,
+          "id": "camera-0-face-0",
+          "x": 312.5,
+          "y": 120.25,
+          "width": 210.4,
+          "height": 246.8,
+          "confidence": 0.94,
+          "landmarks": {
+            "leftEye": { "x": 370.2, "y": 210.4 },
+            "rightEye": { "x": 455.1, "y": 211.0 },
+            "nose": { "x": 413.9, "y": 265.5 },
+            "mouth": { "x": 414.0, "y": 318.2 },
+            "brow": { "x": 412.6, "y": 180.8 }
+          }
+        }
+      ]
+    },
+    {
+      "cameraId": 1,
+      "sourceId": "secondary-side-bay",
+      "frame": { "width": 640, "height": 360 },
+      "faces": []
+    }
+  ]
+}
+```
+
+Recommended future OSC address shape for two active cameras:
+
+```txt
+/emoViz/camera/0/active
+/emoViz/camera/0/faces
+/emoViz/camera/0/face/0/active
+/emoViz/camera/0/face/0/confidence
+/emoViz/camera/0/face/0/box/x
+/emoViz/camera/0/face/0/box/y
+/emoViz/camera/0/face/0/emotion/happy
+/emoViz/camera/1/active
+/emoViz/camera/1/faces
+/emoViz/camera/1/face/0/active
+```
+
+Until that two-camera namespace is implemented, use the existing single-camera OSC namespace below.
 
 Hosted Cloud Run API URLs:
 
