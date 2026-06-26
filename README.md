@@ -60,6 +60,7 @@ Keep local model weights in `/Users/ro/Desktop/KR+D/local-models/` or a `KRD_LOC
 | Path | Purpose |
 |---|---|
 | `docs/implementation-plan.md` | Detailed build plan and technical architecture. |
+| `docs/hardware-requirements.md` | Production-ready single-PC and camera requirements for local backend, TouchDesigner, and up to four detected faces. |
 | `docs/proposal-summary.md` | Source-grounded summary of the attached proposal. |
 | `DECISIONS.md` | Prototype decisions and constraints. |
 | `assets/reference/` | Reference imagery supplied for the overlay treatment. |

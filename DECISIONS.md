@@ -53,3 +53,9 @@
 **Decision:** Migrate Firebase Hosting and Cloud Run from the temporary `ai-emotion-krd` project into the dedicated GCP/Firebase project `emo-viz`, then decommission `ai-emotion-krd`.
 
 **Rationale:** The prototype, repository, service names, and public URLs should consistently use the Emo Viz name. Keeping the temporary project active would create stale URLs and unclear ownership during staging reviews.
+
+## 2026-06-26 - Production Single-Camera Hardware Baseline
+
+**Decision:** For the production hardware recommendation, use one high-quality wide-FOV 4K camera as the default path for detecting up to four adult/child faces, paired with a Windows 11 Pro desktop/workstation, NVIDIA RTX GPU, 32 GB RAM minimum, direct USB 3 camera input, wired Ethernet, and UPS-backed power. Reserve a second camera only as a site-specific fallback if testing proves one camera cannot cover the interaction zone.
+
+**Rationale:** The current browser/backend pipeline expects one live camera stream, and YuNet can detect multiple faces in one frame. A second camera would add integration scope for camera selection, duplicate detection handling, or detection fusion, so it should not be part of the baseline unless the physical install demands it.
