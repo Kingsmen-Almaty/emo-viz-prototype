@@ -17,15 +17,40 @@ One camera is recommended because the current web and backend pipeline expects o
 
 Use two cameras only if site testing proves one camera cannot cover the interaction zone. Two cameras should be treated as a separate integration scope because the app would need a multi-camera selection or fusion strategy before TouchDesigner receives clean face slots.
 
+### Recommended Camera To Purchase
+
+Recommended camera: AVer CAM130 4K conference camera.
+
+Purchase / product link: https://communication.aver.com/model/cam130
+
+Why this camera fits Emo Viz:
+
+- 4K Sony sensor gives the detector more facial detail before the app downsamples for inference.
+- Switchable 90-degree and 120-degree field-of-view modes make it easier to tune the install for adults and children in one frame.
+- 120-degree mode gives useful coverage for up to four visitors; 90-degree mode can be used if the interaction zone is tighter and face size matters more than width.
+- Built-in intelligent fill lighting can help reduce underexposed faces in museum lighting.
+- USB-C / USB 3 connection keeps the installation simpler than HDMI capture or IP-camera ingestion.
+- Conference-camera form factor is better suited to rigid mounting than a consumer webcam clipped to a display.
+
+Recommended starting setup:
+
+- Mount one CAM130 centrally above or near the display.
+- Start at 4K/30 input if the PC is stable, then downsample in the app/backend path as currently implemented.
+- Use 120-degree FOV for first site tests with four people.
+- Switch to 90-degree FOV if the faces become too small or lens distortion affects placement.
+- Lock exposure/brightness settings after lighting is finalized.
+
+If procurement cannot source the CAM130, use the same selection criteria rather than buying the cheapest 4K webcam: 4K sensor, 90 to 120-degree usable FOV, reliable USB 3 connection, lockable image settings, tripod/wall mounting, and good indoor-light performance.
+
 ## Production Camera Spec
 
 | Requirement | Production Baseline |
 |---|---|
-| Camera count | 1 primary camera |
+| Camera count | 1 primary camera, recommended AVer CAM130 |
 | Resolution | 4K sensor preferred; 1080p usable only if the interaction zone is close and well lit |
 | Output to app | 1080p or 1440p capture recommended for runtime; avoid overloading USB/CPU with unnecessary full 4K processing |
 | Frame rate | 30 FPS stable minimum; 60 FPS optional if lighting and USB bandwidth are reliable |
-| Field of view | 90 to 110 degrees diagonal as a starting point for 3 to 4 visitors |
+| Field of view | 90 to 120 degrees diagonal as a starting point for 3 to 4 visitors |
 | Lens behaviour | Low distortion preferred; avoid extreme fisheye unless calibrated and visually acceptable |
 | Focus | Fixed focus or reliable autofocus locked during operation |
 | Exposure | Manual or lockable exposure preferred to avoid brightness pulsing |
@@ -166,12 +191,14 @@ Run this checklist on the target PC and camera mount before calling the system h
 
 ## Procurement Summary
 
-For the current requirement of detecting up to 4 adult/child faces, procure one high-quality wide-FOV 4K camera first and reserve budget/mounting space for a second camera only if site testing proves the interaction zone cannot be covered from one viewpoint.
+For the current requirement of detecting up to 4 adult/child faces, procure one AVer CAM130 4K conference camera first and reserve budget/mounting space for a second camera only if site testing proves the interaction zone cannot be covered from one viewpoint.
 
 For the PC, procure a Windows 11 Pro desktop/workstation with an NVIDIA RTX GPU, 32 GB RAM minimum, 1 TB NVMe SSD, direct USB 3 camera input, wired Ethernet, and UPS-backed power. Use 64 GB RAM and a 12 GB+ VRAM GPU if the final TouchDesigner scene or display output becomes visually heavier.
 
 ## References
 
+- AVer CAM130 product page: https://communication.aver.com/model/cam130
+- AVer CAM130 USA product page: https://www.averusa.com/products/conference-camera/cam130
 - Derivative TouchDesigner system requirements: https://derivative.ca/UserGuide/System_Requirements
 - Derivative TouchDesigner download requirements summary: https://derivative.ca/download
 - Derivative TouchDesigner video server specification guide: https://derivative.ca/UserGuide/TouchDesigner_Video_Server_Specification_Guide
