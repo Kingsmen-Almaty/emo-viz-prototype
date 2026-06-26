@@ -39,7 +39,7 @@ The prototype is split into a static React frontend and a local Python vision ba
 | Sadness assist | YuNet landmark geometry | Uses crop-relative mouth/eye/nose landmarks to reduce FER+'s neutral bias on downturned-mouth sad expressions. |
 | Hosting | Firebase Hosting | Publishes the static frontend at `https://emo-viz.web.app`. |
 | Backend hosting | Cloud Run or local Python service | Public demos use the Cloud Run HTTPS backend. Local installs can run the same Python backend on the exhibit machine for TouchDesigner/OSC output. |
-| TouchDesigner output | OSC over UDP | Optional local output from the Python backend to TouchDesigner `OSC In CHOP`. Disabled by default and enabled with `OSC_ENABLED=1`. |
+| TouchDesigner output | OSC over UDP | Required production path from the Python backend to TouchDesigner `OSC In CHOP`. It can be disabled only for web/backend testing. |
 
 Keep local model weights in `/Users/ro/Desktop/KR+D/local-models/` or a `KRD_LOCAL_MODELS_DIR` override. Do not download model binaries into this project folder.
 
@@ -53,7 +53,7 @@ Keep local model weights in `/Users/ro/Desktop/KR+D/local-models/` or a `KRD_LOC
 | GitHub repository | `https://github.com/Kingsmen-Almaty/emo-viz-prototype` | Nested CSMA prototype repo. |
 | Local web app | `http://127.0.0.1:5178/` | MacBook camera testing via `pnpm dev --port 5178`. |
 | Local backend API | `http://127.0.0.1:8787/` | Python YuNet/FER+ service via `pnpm backend`. |
-| Local TouchDesigner OSC | `udp://127.0.0.1:9000` | Optional OSC output when `OSC_ENABLED=1`. |
+| Local TouchDesigner OSC | `udp://127.0.0.1:9000` | Production TouchDesigner data path when `OSC_ENABLED=1`. |
 
 ## Files
 
@@ -311,7 +311,7 @@ Cloud Run uses HTTPS and is the correct backend target for browsers opening the 
 
 ## TouchDesigner OSC
 
-For TouchDesigner, run the Python backend locally on the same machine as TouchDesigner or on the same LAN. Cloud Run should not be used for OSC because UDP packets need to reach the TouchDesigner workstation directly.
+TouchDesigner is the production emotion grid / lighting renderer. Run the Python backend locally on the same machine as TouchDesigner or on the same LAN so OSC packets can reach the TouchDesigner workstation directly. Cloud Run should not be used for OSC.
 
 Install backend dependencies, then start the backend with OSC enabled:
 

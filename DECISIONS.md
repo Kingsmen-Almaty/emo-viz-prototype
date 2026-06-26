@@ -44,9 +44,9 @@
 
 ## 2026-06-24 - Use Local OSC Over UDP For TouchDesigner
 
-**Decision:** Add optional OSC-over-UDP output to the Python backend, disabled by default and enabled with `OSC_ENABLED=1`. Use normalized `0.0-1.0` feature coordinates and fixed face slots for TouchDesigner `OSC In CHOP` stability.
+**Decision:** Use OSC-over-UDP as the production data path from the Python backend to TouchDesigner, enabled with `OSC_ENABLED=1` for the install. Use normalized `0.0-1.0` feature coordinates and fixed face slots for TouchDesigner `OSC In CHOP` stability.
 
-**Rationale:** TouchDesigner works naturally with OSC/UDP on the local machine or exhibit LAN. Cloud Run cannot directly send UDP packets into an office or exhibit workstation behind NAT, so OSC is an install-side/local-backend integration path while Cloud Run remains the public web backend.
+**Rationale:** TouchDesigner is the production emotion grid / lighting renderer and works naturally with OSC/UDP on the local machine or exhibit LAN. Cloud Run cannot directly send UDP packets into an office or exhibit workstation behind NAT, so OSC is the required install-side/local-backend integration path while Cloud Run remains the public web backend.
 
 ## 2026-06-25 - Consolidate Cloud Resources Under Emo Viz
 

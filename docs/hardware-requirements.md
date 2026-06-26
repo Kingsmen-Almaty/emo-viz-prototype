@@ -156,7 +156,7 @@ Expected production behaviour:
 
 ## Ideal / Headroom Spec
 
-Use this if TouchDesigner will drive richer generative visuals, higher-resolution outputs, LED processors, projection, multiple outputs, or long public operation.
+TouchDesigner is required for the production emotion grid and lighting visual. Use this headroom spec when the required TouchDesigner scene becomes richer, drives higher-resolution outputs, connects to LED processors or projection, uses multiple outputs, or must run for long public operation with extra performance margin.
 
 | Component | Ideal |
 |---|---|
